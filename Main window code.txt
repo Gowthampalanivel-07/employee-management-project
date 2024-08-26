@@ -1,0 +1,196 @@
+from tkinter import *
+from tkinter import ttk
+from tkinter import messagebox
+from tkcalendar import DateEntry
+from database import *
+
+win = Tk()
+win.title("EMPLOYEE MANAGEMENT")
+win.geometry("1200x700")
+win.config(bg="#2c3e50")
+db=Database("mark.db")
+
+
+id = StringVar()
+name = StringVar()
+date = StringVar()
+expense = StringVar()
+amount = DoubleVar()
+mop = StringVar()
+
+
+head_lab = Label(win, text="EMPLOYEE MANAGEMENT", bg="#2c3e50", fg="white", font=("Arial", 18, "bold"))
+head_lab.pack()
+
+frame = Frame(win, height=400, width=600, bg="#2c3e50")
+frame.pack(pady=5)
+
+lab = Label(frame, text="ID", bg="#2c3e50", fg="white", font=("Arial", 16, "bold"))
+lab.grid(row=1, column=0, padx=10, pady=10)
+
+txt1 = Entry(frame, textvariable=id, font=("Arial", 16), width=30)
+txt1.grid(row=1, column=1, padx=10, pady=10)
+
+lab = Label(frame, text="NAME", bg="#2c3e50", fg="white", font=("Arial", 16, "bold"))
+lab.grid(row=1, column=2, padx=10, pady=10)
+
+txt2 = Entry(frame, textvariable=name, font=("Arial", 16), width=30)
+txt2.grid(row=1, column=3, padx=10, pady=10)
+
+lab = Label(frame, text="DATE", bg="#2c3e50", fg="white", font=("Arial", 16, "bold"))
+lab.grid(row=2, column=0, padx=10, pady=10)
+
+txt3 = DateEntry(frame, textvariable=date, font=("Arial", 16), width=28,state="readonly")
+txt3.grid(row=2, column=1, padx=10, pady=10)
+
+lab = Label(frame, text="EXPENSES", bg="#2c3e50", fg="white", font=("Arial", 16, "bold"))
+lab.grid(row=2, column=2, padx=10, pady=10)
+
+txt4 = ttk.Combobox(frame, textvariable=expense, state="readonly", font=("Arial", 16), width=28)
+txt4['values'] = ("FOOD", "FUEL", "TRAVEL")
+txt4.grid(row=2, column=3, padx=10, pady=10)
+
+lab = Label(frame, text="AMOUNT  ", bg="#2c3e50", fg="white", font=("Arial", 16, "bold"))
+lab.grid(row=3, column=0, padx=10, pady=10)
+
+txt5 =Entry(frame, textvariable=amount, font=("Arial", 16), width=30)
+txt5.grid(row=3, column=1, padx=10, pady=10)
+
+lab = Label(frame, text="MOP ", bg="#2c3e50", fg="white", font=("Arial", 16, "bold"))
+lab.grid(row=3, column=2, padx=10, pady=10)
+
+txt6 = ttk.Combobox(frame, textvariable=mop, state="readonly", font=("Arial", 16), width=28)
+txt6['values'] = ("CASH", "CARD", "UPI")
+txt6.grid(row=3, column=3, padx=10, pady=10)
+
+
+
+frame1 = Frame(win, height=400, width=600, bg="#2c3e50")
+frame1.pack(pady=5)
+
+
+def fetch_data():
+    table.delete(*table.get_children())
+    count = 0
+    for row in db.fetch_record():
+        count += 1
+        table.insert("", END,
+                     values=(count, row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
+
+
+
+def clear_all():
+    id.set("")
+    name.set("")
+    date.set("")
+    expense.set("")
+    amount.set("")
+    mop.set("")
+
+
+
+
+
+
+
+def insert():
+    if txt1.get() == "" or txt2.get() == "" or txt3.get() == "" or txt4.get() == "" or txt5.get() == "" or txt6.get() == "":
+            messagebox.showinfo("message", "Please Fill All Records")
+    else:
+
+            db.insert(txt1.get(), txt2.get(), txt3.get(), txt4.get(), txt5.get(), txt6.get())
+            fetch_data()
+            clear_all()
+            messagebox.showinfo("message", "Record inserted Successfully")
+
+
+def update():
+    if txt1.get() == "" or txt2.get() == "" or txt3.get() == "" or txt4.get() == "" or txt5.get() == "" or txt6.get() == "":
+            messagebox.showinfo("message", "Please Fill All Records")
+
+    else:
+
+        db.update_record(txt1.get(), txt2.get(), txt3.get(), txt4.get(), txt5.get(), txt6.get()
+                        , (row[1]))
+        fetch_data()
+        clear_all()
+        messagebox.showinfo("message", "Record updated Successfully")
+
+
+def delete():
+    db.delete_record((row[1]))
+
+    fetch_data()
+    clear_all()
+    messagebox.showinfo("Message", "Record Removed Successfully")
+
+
+
+
+def get_record(e):
+    srow = table.focus()
+    data = table.item(srow)
+    global row
+    row = data['values']
+    id.set(row[2])
+    name.set(row[3])
+    date.set(row[4])
+    expense.set(row[5])
+    amount.set(row[6])
+    mop.set(row[7])
+
+
+bts2 = Button(frame1, text="Insert", width=8, font=("Arial", 14, "bold"), fg="white", bg="#008080", command=insert)
+bts2.grid(row=0, column=0, padx=10)
+
+bts3 = Button(frame1, text="Update", width=8, font=("Arial", 14, "bold"), fg="white", bg="#008080", command=update)
+bts3.grid(row=0, column=1, padx=10)
+
+bts4 = Button(frame1, text="Delete", width=8, font=("Arial", 14, "bold"), fg="white", bg="#008080", command=delete)
+bts4.grid(row=0, column=2, padx=10)
+
+bts5 = Button(frame1, text="Clear", width=8, font=("Arial", 14, "bold"), fg="white", bg="#008080", command=clear_all)
+bts5.grid(row=0, column=3, padx=10)
+
+bts6 = Button(frame1, text="Exit", width=8, font=("Arial", 14, "bold"), fg="white", bg="red", command=exit)
+bts6.grid(row=0, column=4, padx=10)
+
+my_frame = Frame(win,width=1380, height=400)
+my_frame.pack()
+
+style = ttk.Style()
+style.configure("Treeview", font=("times", 15), rowheight=35)
+
+style.configure("Treeview.Heading", font=("times", 14, "bold"))
+
+table = ttk.Treeview(my_frame, columns=(0, 1, 2, 3, 4, 5, 6, 7))
+
+table.column("0", anchor=CENTER, width=60)
+table.column("1", stretch=NO, width=0)
+table.column("2", anchor=CENTER,width=90)
+table.column("3", anchor=CENTER, width=100)
+table.column("4", anchor=CENTER, width=150)
+table.column("5", anchor=CENTER, width=100)
+table.column("6", anchor=CENTER, width=100)
+table.column("7", anchor=CENTER, width=100)
+
+
+
+table.heading("0", text="S.No")
+table.heading("1", text="ID")
+table.heading("2", text="ID")
+table.heading("3", text="NAME ")
+table.heading("4", text="DATE")
+table.heading("5", text="EXPENSE")
+table.heading("6", text="AMOUNT ")
+table.heading("7", text="MOP ")
+
+
+table["show"] = 'headings'
+table.bind("<ButtonRelease-1>", get_record)
+table.pack(fill=X)
+
+obj = fetch_data()
+
+
+win.mainloop()

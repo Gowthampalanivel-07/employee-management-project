@@ -1,0 +1,47 @@
+import sqlite3
+
+
+class Database:
+    def __init__(self, db):
+        self.con = sqlite3.connect(db)
+        self.c = self.con.cursor()
+        self.c.execute("""
+        CREATE TABLE IF NOT EXISTS Mark_list(
+        pid INTEGER PRIMARY KEY,
+        id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        date TEXT NOT NULL,
+        expense TEXT NOT NULL,
+        amount TEXT NOT NULL,
+        mop TEXT NOT NULL
+   
+        )
+        """)
+        self.con.commit()
+
+    def insert(self,id, name, date, expense, amount, mop):
+        sql = """
+        insert into Mark_list values(NULL,?,?,?,?,?,?)
+        """
+        self.c.execute(sql, (id, name, date, expense, amount, mop))
+        self.con.commit()
+
+    def fetch_record(self):
+        self.c.execute("SELECT * FROM Mark_list")
+        datas = self.c.fetchall()
+        return datas
+
+    def update_record(self, id, name, date, expense, amount, mop, pid):
+        sql = """
+        UPDATE Mark_list set id=?,name=?,date=?,expense=?,amount=?,mop=? where pid=?
+        """
+        self.c.execute(sql, (id, name, date, expense, amount, mop, pid))
+        self.con.commit()
+
+    def delete_record(self, pid):
+        sql = "delete from Mark_list where pid=?"
+        self.c.execute(sql, (pid,))
+        self.con.commit()
+
+
+mob = Database("mark.db")
